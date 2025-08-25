@@ -8,8 +8,14 @@ const VALID_IMAGE_FORMAT = {
   "image/png": [],
 };
 
-const DragAndDropPhoto = ({ profilePicture, setProfilePicture, setErrMsg }) => {
+const DragAndDropPhoto = ({ profilePicture, setProfilePicture, setSuccess, setErrMsg }) => {
   const [dataURL, setDataURL] = useState(null);
+
+  useEffect(() => {
+    setErrMsg("");
+    setSuccess("");
+  }, [dataURL]);
+
   useEffect(() => {
     if (profilePicture) {
       if (typeof profilePicture === "string") {
@@ -29,7 +35,6 @@ const DragAndDropPhoto = ({ profilePicture, setProfilePicture, setErrMsg }) => {
     maxSize: FILE_SIZE_MAX,
     onDropAccepted: (files) => {
       setProfilePicture(files[0]);
-      setErrMsg("");
     },
     onDropRejected: (fileRejections) => {
       fileRejections.forEach((rej) => {

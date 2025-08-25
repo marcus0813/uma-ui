@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import useAxiosPrivate from "./useAxiosPrivate";
 
 const useAxiosPrivateFetch = () => {
+  const [requestMethod, setRequestMethod] = useState(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -41,11 +42,29 @@ const useAxiosPrivateFetch = () => {
     [axiosPrivate]
   );
 
-  const GET = useCallback((url) => fetchData("GET", url), [fetchData]);
-  const POST = useCallback((url, payload) => fetchData("POST", url, payload), [fetchData]);
-  const PUT = useCallback((url, payload) => fetchData("PUT", url, payload), [fetchData]);
+  const GET = useCallback(
+    (url) => {
+      setRequestMethod("GET");
+      return fetchData(requestMethod, url);
+    },
+    [fetchData]
+  );
+  const POST = useCallback(
+    (url, payload) => {
+      setRequestMethod("POST");
+      return fetchData("POST", url, payload);
+    },
+    [fetchData]
+  );
+  const PUT = useCallback(
+    (url, payload) => {
+      setRequestMethod("PUT");
+      return fetchData("PUT", url, payload);
+    },
+    [fetchData]
+  );
 
-  return { data, loading, statusCode, errorMessage, GET, POST, PUT };
+  return { requestMethod, data, loading, statusCode, errorMessage, GET, POST, PUT };
 };
 
 export default useAxiosPrivateFetch;

@@ -9,15 +9,13 @@ import { useNavigate } from "react-router-dom";
 import API_ENDPOINTS from "../../services/api/apiEndpoints";
 import useAxiosPrivateFetch from "../../hooks/useAxiosPrivateFetch";
 import { validateName, validatePassword } from "../../utils/regexValidators";
-import useRefreshToken from "../../hooks/useRefreshToken";
 import useAuth from "../../hooks/useAuth";
 
 const Profile = () => {
   const userRef = useRef();
   const errRef = useRef();
   const navigate = useNavigate();
-  const refresh = useRefreshToken();
-  const { GET, POST, PUT, statusCode, data, errorMessage } = useAxiosPrivateFetch();
+  const { GET, POST, PUT, statusCode, data, errorMessage, requestMethod } = useAxiosPrivateFetch();
   const { auth, setAuth } = useAuth();
 
   const [title, setTitle] = useState("");
@@ -45,21 +43,20 @@ const Profile = () => {
 
   const [errMsg, setErrMsg] = useState("");
   const [updatedUserInfo, setUpdatedUserInfo] = useState(false);
-  const [updatedProfilePicture, setUpdatedProfilePicture] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     //Always return to login if no valid token
-    if (!auth?.data) navigate("/");
+    if (auth == {}) navigate("/");
 
     userRef.current.focus();
 
     //Cancel request whenever componet unmount
     const controller = new AbortController();
 
-    //get auth for token
-    var userID = auth.userID;
-    var email = auth.email;
+    //get auth for token, send default if no auth
+    const userID = auth?.userID || "00000000-0000-0000-0000-000000000000";
+    const email = auth?.email || "00000000-0000-0000-0000-000000000000";
     var url = `${API_ENDPOINTS.user.profile}?userid=${userID}&email=${email}`;
 
     const getUserInfo = async () => {
@@ -96,7 +93,7 @@ const Profile = () => {
   }, [firstName, lastName, password, matchPassword]);
 
   useEffect(() => {
-    if (statusCode == 200) {
+    if (statusCode == 200 && requestMethod == "GET") {
       setFirstName(data.user.firstName);
       setLastName(data.user.lastName);
       setEmail(data.user.email);
@@ -133,6 +130,20 @@ const Profile = () => {
       return;
     }
 
+    const updateProfilePictureUrl = API_ENDPOINTS.user.profile_picture;
+    let profilePictureFormData = new FormData();
+    if (profilePicture instanceof File) {
+      profilePictureFormData.append("ProfilePicture", profilePicture);
+      profilePictureFormData.append("UserID", auth.userID);
+      profilePictureFormData.append("Email", auth.email);
+      await POST(updateProfilePictureUrl, profilePictureFormData);
+      if (statusCode !== 200) {
+        setErrMsg("Failed to update profile picture");
+        errRef.current.focus();
+        return;
+      }
+    }
+
     const userID = auth.userID;
     const updateProfileUrl = API_ENDPOINTS.user.profile;
     const updateProfilePayload = JSON.stringify({ userID, firstName, lastName, email, password });
@@ -143,23 +154,13 @@ const Profile = () => {
       return;
     }
 
-    const updateProfilePictureUrl = API_ENDPOINTS.user.profile_picture;
-    let profilePictureFormData = new FormData();
-    profilePictureFormData.append("ProfilePicture", profilePicture);
-    profilePictureFormData.append("UserID", auth.userID);
-    profilePictureFormData.append("Email", auth.email);
-    await POST(updateProfilePictureUrl, profilePictureFormData);
-    if (statusCode !== 200) {
-      setErrMsg("Failed to update profile picture");
-      errRef.current.focus();
-      return;
-    }
-
     setSuccess(true);
+    setTitle(`Hi, ${firstName} ${lastName}`);
   };
 
   const logout = async () => {
     setAuth({});
+    navigate("/");
   };
 
   return (
@@ -182,6 +183,7 @@ const Profile = () => {
               <DragAndDropPhoto
                 profilePicture={profilePicture}
                 setProfilePicture={setProfilePicture}
+                setSuccess={setSuccess}
                 setErrMsg={setErrMsg}
               />
             </div>
@@ -273,10 +275,6 @@ const Profile = () => {
                 8 to 24 characters.
                 <br />
                 Must include uppercase and lowercase letters and a number.
-                <br />
-                Allowed special characters: <span aria-label="exclamation mark">!</span>{" "}
-                <span aria-label="at symbol">@</span> <span aria-label="hashtag">#</span>{" "}
-                <span aria-label="dollar sign">$</span> <span aria-label="percent">%</span>
               </p>
             </div>
 
