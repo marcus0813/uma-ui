@@ -10,69 +10,69 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
-  const title = "Login";
+  const title = "Welcome to UMA!!!";
   const redirectPath = "Register";
   const { POST, statusCode, data, errorMessage } = useAxiosPublicFetch();
   const navigate = useNavigate();
 
-  const { auth, setAuth } = useContext(AuthContext);
+  const { setAuth } = useContext(AuthContext);
   const userRef = useRef();
   const errRef = useRef();
 
   const [email, setEmail] = useState("");
-  const [validEmail, setValidEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errMsg, setErrMsg] = useState("");
+
+  // Use a separate state for email validation status
+  const [validEmail, setValidEmail] = useState(false);
 
   useEffect(() => {
     userRef.current.focus();
   }, []);
 
+  // Effect to validate email as user types
   useEffect(() => {
     const emailValid = validateEmail(email);
     setValidEmail(emailValid);
-    setErrMsg("");
-  }, [email, password]);
+    // Clear the error message related to email validation
+    if (errMsg && emailValid) {
+      setErrMsg("");
+    }
+  }, [email]);
 
+  // Handle API response and redirect
   useEffect(() => {
-    //Redirecting to profile page after success
-    if (statusCode == 200 && data) {
-      //Empty the state whenever API is called
-      setEmail("");
-      setPassword("");
-
-      //Decode access token
+    if (statusCode === 200 && data) {
+      // Decode access token
       const decodedToken = jwtDecode(data);
-      //Get User ID
+      // Get User ID
       const userID = decodedToken.sub;
-      //Set to global state
-      setAuth({ email, userID, data });
-      //Set for refresh token
-    } else {
+      // Set to global state
+      setAuth({ email, userID, accessToken: data });
+      // Redirect to profile page
+      navigate(`/${userID}`);
+    } else if (errorMessage) {
       setErrMsg(errorMessage);
       errRef.current.focus();
-      navigate("/");
     }
-  }, [statusCode, data]);
-
-  useEffect(() => {
-    if (auth?.userID && auth?.data)
-      //Redirect to profile page
-      navigate(`/${auth.userID}`);
-  }, [auth, navigate]);
+  }, [statusCode, data, errorMessage, setAuth, navigate, email]);
 
   const handleSubmit = async (e) => {
-    //prevent refresh
     e.preventDefault();
 
-    //check email format is valid
-    const emailValid = validateEmail(email);
-    setValidEmail(emailValid);
+    // Reset error message on new submission attempt
+    setErrMsg("");
 
-    //Set request body params
-    var payload = JSON.stringify({ email, password });
+    // Check email format is valid before making the API call
+    if (!validateEmail(email)) {
+      setErrMsg("Kindly input a valid email.");
+      return;
+    }
 
-    //Login user
+    // Set request body params
+    const payload = JSON.stringify({ email, password });
+
+    // Login user
     await POST(API_ENDPOINTS.login, payload);
   };
 
@@ -84,6 +84,7 @@ const Login = () => {
         </p>
 
         <Header title={title} />
+        <h3 style={{ textAlign: "center" }}>Login</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email" className="label-text">
