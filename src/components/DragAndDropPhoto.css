@@ -1,0 +1,113 @@
+.picker {
+  border: 1px solid #6f6f6f;
+  border-style: dashed;
+  padding: 20px;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 200px;
+  height: 200px;
+  /* fixed height */
+  margin: 0 auto;
+  border-radius: 5px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.zone {
+  width: 100%;
+  height: 100%;
+  /* fill container */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed #6f6f6f;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.selected img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  /* fits inside container without cropping */
+}
+.actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.actions button {
+  padding: 5px 10px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.drop-zone {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.drag-files,
+.drop-files {
+  border-radius: inherit;
+  width: 100%;
+  height: 140px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 300ms;
+}
+
+.uploaded-txt {
+  background-color: rgb(34, 116, 135);
+  padding: 10px;
+  border-radius: 3px;
+}
+
+.upload-btn {
+  background-color: rgb(34, 135, 34);
+  color: white;
+}
+
+.cancel-btn {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: rgb(135, 34, 34);
+  color: white;
+}
+
+.drop-files {
+  background-color: #343333;
+  color: #545353;
+}
+
+.container img {
+  width: 100%;
+  display: block;
+  border-radius: inherit;
+}
+
+.uploaded-url {
+  display: block;
+  width: 100%;
+  font-size: 1em;
+  word-wrap: break-word;
+  margin: 10px 0;
+  color: orange;
+  text-decoration: underline;
+}
+
+.photo-label {
+  font-size: medium;
+  text-align: center;
+}
