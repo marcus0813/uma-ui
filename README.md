@@ -65,7 +65,7 @@ npm start
 yarn start
 ```
 
-The app should now be running at http://localhost:3000.
+The app should now be running at https://localhost:3000.
 
 ## Assumptions
 This project is a React-based frontend designed to integrate with UMA-API. It follows modular architecture principles for scalability and maintainability.
