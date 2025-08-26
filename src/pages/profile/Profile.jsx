@@ -46,8 +46,8 @@ const Profile = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    //Always return to login if no valid token
-    if (auth == {}) navigate("/");
+    //Always wait until auth loaded
+    if (!auth) return;
 
     userRef.current.focus();
 
@@ -100,8 +100,8 @@ const Profile = () => {
       setTitle(`Hi, ${data.user.firstName} ${data.user.lastName}`);
       setProfilePicture(data.user.profilePictureUrl);
       setErrMsg("");
-    } else if (statusCode == 401) {
-      setAuth({});
+    } else if (statusCode == 404) {
+      navigate("/");
     }
   }, [statusCode]);
 
