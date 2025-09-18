@@ -1,25 +1,31 @@
-import Layout from "./components/ui/layout/Layout";
-import Register from "./pages/register/Register";
-import Login from "./pages/login/Login";
-import Profile from "./pages/profile/Profile";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import Movies from "./pages/Movies";
+import MovieDetails from "./pages/MovieDetails";
+import SeatLayout from "./pages/SeatLayout";
+import MyBookings from "./pages/MyBookings";
+import Favourite from "./pages/Favourite";
+import { Toaster } from "react-hot-toast";
 
 function App() {
+  const isAdminRoute = useLocation().pathname.startsWith("/admin");
+
   return (
-    // <DataProvider>
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Login />} />
-        <Route path="Register">
-          <Route index element={<Register />} />
-        </Route>
-        <Route path=":id">
-          <Route index element={<Profile />} />
-        </Route>
-        <Route path="*" element={<Login />} />
-      </Route>
-    </Routes>
-    // </DataProvider>
+    <>
+      <Toaster />
+      {!isAdminRoute && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/movies" element={<Movies />} />
+        <Route path="/movies/:id" element={<MovieDetails />} />
+        <Route path="/movies/:id/:date" element={<SeatLayout />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/favorite" element={<Favourite />} />
+      </Routes>
+      {!isAdminRoute && <Footer />}
+    </>
   );
 }
 
